@@ -10,6 +10,7 @@ FSJS Project 3 - Interactive Form
 */
 document.addEventListener('DOMContentLoaded', () => {
   let nameInput = document.querySelector("#name");
+  let emailInput = document.querySelector("#email");
   let jobRole = document.querySelector('#title');
 
   let tShirtSize = document.querySelector('#size');
@@ -19,13 +20,26 @@ document.addEventListener('DOMContentLoaded', () => {
   let activitiesArea = document.querySelector('#activities-box');
   let totalCostArea = document.querySelector('.activities-cost');
 
+  let paymentVersion = "select method";
   let paymentType = document.querySelector('#payment');
-  let epirationDate = document.querySelector('#exp-month');
+  let creditCard = document.querySelector('#credit-card');
+  let payPal = document.querySelector('#paypal');
+  let bitCoin = document.querySelector('#bitcoin');
+
+  let expirationDate = document.querySelector('#exp-month');
+  let expirationYear = document.querySelector('#exp-year');
+  let cardNumber = document.querySelector('#cc-num');
+  let zipCode = document.querySelector('#zip');
+  let CVV = document.querySelector('#cvv');
+
+  const formElement = document.querySelector('form');
 
   function initialSetup(){
     focusOnName();  
+    hideJobRole();
     tShirtColor.disabled = true;
     totalCostArea.textContent = "Total: $0";
+    resetPayment();
   }
      
   initialSetup();
@@ -37,15 +51,14 @@ document.addEventListener('DOMContentLoaded', () => {
  
    // 4) Display "Other job role?" if any option but "Other" is selected from "Job Role" dropdown
   jobRole.addEventListener("change", (event) => {   
+    hideJobRole();
+  });
+
+  function hideJobRole(){
     let otherJobInput = document.querySelector("#other-job-role");
 
-    otherJobInput.hidden = (jobRole.value == 'other');
-    // if (jobRole.value == 'other') {
-        //     otherJobInput.hidden = false;
-        // } else {
-        //     otherJobInput.hidden = true;
-        // }    
-  });
+    otherJobInput.hidden = (jobRole.value != 'other');
+  }
     
   // 5) User can select Design option, then Color options of that brand will be displayed. 
   //    Otherwise Color is disabled to default each time Design changes.
@@ -100,12 +113,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const allActivities = document.querySelectorAll('#activities-box [type="checkbox"]');
     let checked = checkbox.checked;
 
-    // console.log("1 Cost="+activityCost);
-    // console.log("1total Cost="+totalCost);
-
     if (checked){
       for (const activity of allActivities){
-        //console.log("Name1"+activity.name +" and2 "+ checkbox.name);
         if((getTime(activity) === getTime(checkbox)) && (activity.name !== checkbox.name)){
           activity.parentElement.classList.add('disabled');
           activity.disabled = true;
@@ -116,7 +125,6 @@ document.addEventListener('DOMContentLoaded', () => {
       totalCost = totalCost + activityCost;
     } else{
       for (const activity of allActivities){
-        //console.log("Name1"+activity.name +" and2 "+ checkbox.name);
         if((getTime(activity) === getTime(checkbox)) && (activity.name !== checkbox.name)){
           activity.parentElement.classList.remove('disabled');
           activity.disabled = false;
@@ -127,14 +135,191 @@ document.addEventListener('DOMContentLoaded', () => {
       totalCost = totalCost - activityCost;
     }
 
-    // console.log("2 Cost="+activityCost);
-    // console.log("2total Cost="+totalCost);
     totalCostArea.textContent = `Total: $${totalCost}`;
 
     function getTime(activity){
       return activity.dataset.dayAndTime;
     }
   });
+
+  // 7) 
+  paymentType.addEventListener("change", (e) => {
+    let selectedPayment = paymentType.value;
+    paymentVersion = selectedPayment;
+
+    console.log("2 ="+ selectedPayment);
+    if(selectedPayment === "credit-card"){
+      decideDisplayedPayments(creditCard, true);
+      decideDisplayedPayments(payPal, false);
+      decideDisplayedPayments(bitCoin, false);
+      
+      resetCreditCard();
+    } else if(selectedPayment === "paypal"){
+      decideDisplayedPayments(creditCard, false);
+      decideDisplayedPayments(payPal, true);
+      decideDisplayedPayments(bitCoin, false);
+    } else if(selectedPayment === "bitcoin"){
+      decideDisplayedPayments(creditCard, false);
+      decideDisplayedPayments(payPal, false);
+      decideDisplayedPayments(bitCoin, true);
+    }
+  });
+
+ /* Note - decide position of next 3 methods
+ */
+  function resetPayment(){
+    decideDisplayedPayments(creditCard, true);
+    decideDisplayedPayments(payPal, false);
+    decideDisplayedPayments(bitCoin, false);
+
+    resetCreditCard()
+  }
+
+  function decideDisplayedPayments(payArea, view){
+    if(view == true){
+      payArea.style.display = "block";  
+    }else{
+      payArea.style.display = "none";  
+    }
+  }
+
+  function resetCreditCard(){   
+    expirationDate.selectedIndex = 0;
+    expirationYear.selectedIndex = 0;
+    cardNumber.value = "";
+    zipCode.value = "";
+    CVV.value = "";
+  }
+
+  /***
+   * 8) The final requirements for submitting the form
+   */
+  formElement.addEventListener("submit", finalCheckup);
+
+  function finalCheckup(){
+
+    if((paymentVersion == "select method") || (paymentVersion == "credit-card")){
+      validCVV();
+      validZipCode();
+      validCreditCard();
+    }
+
+    validName();
+    validEmail();
+    validActivitiesAreChecked();
+  }
+
+  nameInput.addEventListener("change", validName);
+
+  function validName(){
+    let regex = /^\S+$/i;
+    let valid = regex.test(nameInput.value);
+
+    console.log("9 ="+ valid);
+    return checkIfInputIsValid(valid, nameInput);
+  }
+
+  emailInput.addEventListener("change", validEmail);
+
+  function validEmail(){
+    let regex = /^[^@]+@[^@.]+\.(com|org|net)$/i;  //  /^[^@]+@[^@.]+\.[a-z]+$/i;
+    let valid = regex.test(emailInput.value);
+
+    console.log("3 ="+ valid);
+    return checkIfInputIsValid(valid, emailInput);
+  }
+
+  activitiesArea.addEventListener("change", validActivitiesAreChecked);
+
+  function validActivitiesAreChecked() {
+    const checkboxes = document.querySelectorAll('#activities-box [type="checkbox"]');
+    let anyAreChecked = false;
+  
+    for (const c of checkboxes) {
+      if (c.checked) {
+        anyAreChecked = true;
+      }
+    }
+  
+    checkIfInputIsValid(anyAreChecked, activitiesArea);
+    return anyAreChecked;
+  }
+   
+  cardNumber.addEventListener("change", (e) => {
+    let creditCard = e.target;
+
+    validCreditCard();
+  });
+
+  function validCreditCard(){
+    let regex = /^\d{13,15}$/i;
+    let valid = regex.test(cardNumber.value);
+
+    return checkIfInputIsValid(valid, cardNumber);
+  }
+
+  zipCode.addEventListener("change", (e) => {
+    let currentZipCode = e.target;
+
+    validZipCode();
+  });
+
+  function validZipCode(){
+    let regex = /^(\d{5})$/i;
+    let valid = regex.test(zipCode.value);
+
+    return checkIfInputIsValid(valid, zipCode);
+  }
+
+  CVV.addEventListener("change", (e) => {   
+    let cvvNumber = e.target;
+
+    validCVV();
+  });
+
+  function validCVV(){
+    let regex = /^(\d{3})$/i;
+    let valid = regex.test(CVV.value);
+
+    return checkIfInputIsValid(valid, CVV);
+  }
+
+
+
+
+
+  function checkIfInputIsValid(valid, element){
+    if (valid){
+      makeInputValid(element);
+    }else{
+      makeInputInvalid(element, event);
+    }
+
+    return valid;
+  }
+
+  /**
+  * Display notification on valid status
+  * @param {*} element - Input being checked up on
+  */
+  function makeInputValid(element){ 
+    element.parentElement.classList.remove('invalid');
+    element.parentElement.classList.add('valid');
+    element.parentElement.lastElementChild.style.display = 'none';
+  }
+
+  /**
+  * Display notification in invalid status, also stopping the final submission
+  * @param {*} element  - Input being checked up on
+  */
+  function makeInputInvalid(element, event){
+    event.preventDefault();
+    element.parentElement.classList.remove('valid');
+    element.parentElement.classList.add('invalid');
+    element.parentElement.lastElementChild.style.display = 'block';
+  }
+
+
 
   // jobRole.addEventListener('click', (e) => {
   //     const button = e.target;
