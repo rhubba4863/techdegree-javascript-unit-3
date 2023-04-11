@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let tShirtColor = document.querySelector('#color');
 
   let activitiesArea = document.querySelector('#activities-box');
+  let allActivities = document.querySelectorAll('#activities-box [type="checkbox"]');
   let totalCostArea = document.querySelector('.activities-cost');
 
   let paymentVersion = "select method";
@@ -34,6 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const formElement = document.querySelector('form');
 
+  /***
+   * Setup initial values of page, and place focus on name input
+   */
   function initialSetup(){
     focusOnName();  
     hideJobRole();
@@ -43,13 +47,29 @@ document.addEventListener('DOMContentLoaded', () => {
   }
      
   initialSetup();
+
+  connectActivities();
+
+  /***
+   *  9) Setup focus state for navigating (tab) between each activity. 
+   **/
+  function connectActivities() {
+    for (const activity of allActivities) {
+      activity.addEventListener('focus', () => activity.parentElement.classList.add('focus'));
+      activity.addEventListener('blur', () => activity.parentElement.classList.remove('focus'));
+    }
+  }
     
-  // 3) Select "Name" field so user can type within
+  /***
+   * 3) Select "Name" field so user can type within
+   */ 
   function focusOnName() {
     nameInput.focus(); //or .blur()   
   }
- 
-   // 4) Display "Other job role?" if any option but "Other" is selected from "Job Role" dropdown
+
+  /***
+   * 4) Display "Other job role?" if any option but "Other" is selected from "Job Role" dropdown
+   */
   jobRole.addEventListener("change", (event) => {   
     hideJobRole();
   });
@@ -59,11 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     otherJobInput.hidden = (jobRole.value != 'other');
   }
-    
-  // 5) User can select Design option, then Color options of that brand will be displayed. 
-  //    Otherwise Color is disabled to default each time Design changes.
+
+  /***
+   * 5) User can select Design option, then Color options of that brand will be displayed. 
+   *    Otherwise Color is disabled to default each time Design changes.
+   */
   tShirtDesign.addEventListener("change", (event) => {      
-    //Options: "Select Theme", "js puns", "heart js"
     let tShirtValue = tShirtDesign.value;
     let jsPunColors = document.querySelectorAll('[data-theme="js puns"]');
     let heartJsColors = document.querySelectorAll('[data-theme="heart js"]');
@@ -74,17 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
       tShirtColor.disabled = true;
     }
 
-    //console.log("ShirtVal="+tShirtValue);
-
     if(tShirtValue === 'js puns'){
       decideColorOptions(jsPunColors, true);
       decideColorOptions(heartJsColors, false);
     } else if(tShirtValue === 'heart js'){
       decideColorOptions(jsPunColors, false);
       decideColorOptions(heartJsColors, true);
-    }else{
-      //console.log("value="+ tShirtValue);
-      //console.log("color="+ tShirtColor.value);
     }
 
     //refresh to default color when Design changes
@@ -104,13 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 6) 
+  /***
+   *  6)
+   */
   activitiesArea.addEventListener("change", (e) => {
     const checkbox = e.target;
     let activityCost = parseInt(checkbox.dataset.cost);
     let totalCost = parseInt(totalCostArea.textContent.substring(8));
 
-    const allActivities = document.querySelectorAll('#activities-box [type="checkbox"]');
     let checked = checkbox.checked;
 
     if (checked){
@@ -209,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
     validActivitiesAreChecked();
   }
 
-  nameInput.addEventListener("change", validName);
+  nameInput.addEventListener("keyup", validName);
 
   function validName(){
     let regex = /^\S+$/i;
@@ -219,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return checkIfInputIsValid(valid, nameInput);
   }
 
-  emailInput.addEventListener("change", validEmail);
+  emailInput.addEventListener("keyup", validEmail);
 
   function validEmail(){
     let regex = /^[^@]+@[^@.]+\.(com|org|net)$/i;  //  /^[^@]+@[^@.]+\.[a-z]+$/i;
@@ -245,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return anyAreChecked;
   }
    
-  cardNumber.addEventListener("change", (e) => {
+  cardNumber.addEventListener("keyup", (e) => {
     let creditCard = e.target;
 
     validCreditCard();
@@ -258,7 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return checkIfInputIsValid(valid, cardNumber);
   }
 
-  zipCode.addEventListener("change", (e) => {
+  zipCode.addEventListener("keyup", (e) => {
     let currentZipCode = e.target;
 
     validZipCode();
@@ -271,7 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return checkIfInputIsValid(valid, zipCode);
   }
 
-  CVV.addEventListener("change", (e) => {   
+  CVV.addEventListener("keyup", (e) => {   
     let cvvNumber = e.target;
 
     validCVV();
@@ -303,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
   * @param {*} element - Input being checked up on
   */
   function makeInputValid(element){ 
-    element.parentElement.classList.remove('invalid');
+    element.parentElement.classList.remove('not-valid');
     element.parentElement.classList.add('valid');
     element.parentElement.lastElementChild.style.display = 'none';
   }
@@ -315,7 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function makeInputInvalid(element, event){
     event.preventDefault();
     element.parentElement.classList.remove('valid');
-    element.parentElement.classList.add('invalid');
+    element.parentElement.classList.add('not-valid');
     element.parentElement.lastElementChild.style.display = 'block';
   }
 
