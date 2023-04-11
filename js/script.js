@@ -9,8 +9,6 @@ Treehouse Techdegree:
 FSJS Project 3 - Interactive Form
 */
 document.addEventListener('DOMContentLoaded', () => {
-  console.log("Test");
-
   let nameInput = document.querySelector("#name");
   let jobRole = document.querySelector('#title');
 
@@ -18,17 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
   let tShirtDesign = document.querySelector('#design');
   let tShirtColor = document.querySelector('#color');
 
+  let activitiesArea = document.querySelector('#activities-box');
+  let totalCostArea = document.querySelector('.activities-cost');
+
+  let paymentType = document.querySelector('#payment');
+  let epirationDate = document.querySelector('#exp-month');
 
   function initialSetup(){
     focusOnName();  
     tShirtColor.disabled = true;
-
-
+    totalCostArea.textContent = "Total: $0";
   }
      
   initialSetup();
     
-   // 3) Select "Name" field so user can type within
+  // 3) Select "Name" field so user can type within
   function focusOnName() {
     nameInput.focus(); //or .blur()   
   }
@@ -45,13 +47,13 @@ document.addEventListener('DOMContentLoaded', () => {
         // }    
   });
     
-  // 5) 
+  // 5) User can select Design option, then Color options of that brand will be displayed. 
+  //    Otherwise Color is disabled to default each time Design changes.
   tShirtDesign.addEventListener("change", (event) => {      
     //Options: "Select Theme", "js puns", "heart js"
     let tShirtValue = tShirtDesign.value;
     let jsPunColors = document.querySelectorAll('[data-theme="js puns"]');
     let heartJsColors = document.querySelectorAll('[data-theme="heart js"]');
-
 
     if(tShirtValue != "Select Theme"){
       tShirtColor.disabled = false;
@@ -59,28 +61,22 @@ document.addEventListener('DOMContentLoaded', () => {
       tShirtColor.disabled = true;
     }
 
-    console.log("ShirtVal="+tShirtValue);
+    //console.log("ShirtVal="+tShirtValue);
 
-    //if(tShirtValue.localeCompare(tShirtValue, undefined, { sensitivity: 'js puns' })){
-    if(tShirtValue=== 'js puns'){
+    if(tShirtValue === 'js puns'){
       decideColorOptions(jsPunColors, true);
       decideColorOptions(heartJsColors, false);
-    }
-    else if(tShirtValue === 'heart js'){
-    //else if (tShirtValue.localeCompare(tShirtValue, undefined, { sensitivity: 'heart js' })){
+    } else if(tShirtValue === 'heart js'){
       decideColorOptions(jsPunColors, false);
       decideColorOptions(heartJsColors, true);
     }else{
       //console.log("value="+ tShirtValue);
+      //console.log("color="+ tShirtColor.value);
     }
 
-    //refresh to default color when 
+    //refresh to default color when Design changes
     //https://stackoverflow.com/questions/25542129/reset-value-of-hidden-field-when-dropdown-selected-javascript
     tShirtColor.selectedIndex = 0;
-
-    console.log("color="+ tShirtColor.value);
-   
-    console.log("2 ="+ tShirtDesign.value);
  
     function decideColorOptions(colors, view){
       if(view == true){
@@ -95,6 +91,50 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // 6) 
+  activitiesArea.addEventListener("change", (e) => {
+    const checkbox = e.target;
+    let activityCost = parseInt(checkbox.dataset.cost);
+    let totalCost = parseInt(totalCostArea.textContent.substring(8));
+
+    const allActivities = document.querySelectorAll('#activities-box [type="checkbox"]');
+    let checked = checkbox.checked;
+
+    // console.log("1 Cost="+activityCost);
+    // console.log("1total Cost="+totalCost);
+
+    if (checked){
+      for (const activity of allActivities){
+        //console.log("Name1"+activity.name +" and2 "+ checkbox.name);
+        if((getTime(activity) === getTime(checkbox)) && (activity.name !== checkbox.name)){
+          activity.parentElement.classList.add('disabled');
+          activity.disabled = true;
+        }
+      }
+      
+      //Now change cost
+      totalCost = totalCost + activityCost;
+    } else{
+      for (const activity of allActivities){
+        //console.log("Name1"+activity.name +" and2 "+ checkbox.name);
+        if((getTime(activity) === getTime(checkbox)) && (activity.name !== checkbox.name)){
+          activity.parentElement.classList.remove('disabled');
+          activity.disabled = false;
+        }
+      }
+        
+      //Now change cost
+      totalCost = totalCost - activityCost;
+    }
+
+    // console.log("2 Cost="+activityCost);
+    // console.log("2total Cost="+totalCost);
+    totalCostArea.textContent = `Total: $${totalCost}`;
+
+    function getTime(activity){
+      return activity.dataset.dayAndTime;
+    }
+  });
 
   // jobRole.addEventListener('click', (e) => {
   //     const button = e.target;
