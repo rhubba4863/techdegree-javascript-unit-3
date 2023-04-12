@@ -4,10 +4,10 @@ https://www.w3schools.com/jsref/prop_text_disabled.asp
 */
 
 
-/*
-Treehouse Techdegree:
-FSJS Project 3 - Interactive Form
-*/
+/***
+ * Treehouse Techdegree:
+ * FSJS Project 3 - Interactive Form
+ */
 document.addEventListener('DOMContentLoaded', () => {
   let nameInput = document.querySelector("#name");
   let emailInput = document.querySelector("#email");
@@ -47,7 +47,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
      
   initialSetup();
-
   connectActivities();
 
   /***
@@ -64,16 +63,17 @@ document.addEventListener('DOMContentLoaded', () => {
    * 3) Select "Name" field so user can type within
    */ 
   function focusOnName() {
-    nameInput.focus(); //or .blur()   
+    nameInput.focus();  
   }
 
-  /***
-   * 4) Display "Other job role?" if any option but "Other" is selected from "Job Role" dropdown
-   */
+
   jobRole.addEventListener("change", (event) => {   
     hideJobRole();
   });
 
+  /***
+   * 4) Display "Other job role?" if any option but "Other" is selected from "Job Role" dropdown
+   */
   function hideJobRole(){
     let otherJobInput = document.querySelector("#other-job-role");
 
@@ -182,8 +182,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
- /* Note - decide position of next 3 methods
- */
+ /***
+  *  Show Credit Card options, and clear them to original values.
+  */
   function resetPayment(){
     decideDisplayedPayments(creditCard, true);
     decideDisplayedPayments(payPal, false);
@@ -192,6 +193,11 @@ document.addEventListener('DOMContentLoaded', () => {
     resetCreditCard()
   }
 
+  /***
+   * Determines if certain payment elements are to be displayed for UI   
+   * @param {element} payArea - The theme of the t-shirt.
+   * @param {Boolean} view - Option if element is to be shown
+   */
   function decideDisplayedPayments(payArea, view){
     if(view == true){
       payArea.style.display = "block";  
@@ -200,6 +206,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  /***
+   * Sets credit card to original empty values
+   */
   function resetCreditCard(){   
     expirationDate.selectedIndex = 0;
     expirationYear.selectedIndex = 0;
@@ -208,13 +217,13 @@ document.addEventListener('DOMContentLoaded', () => {
     CVV.value = "";
   }
 
-  /***
-   * 8) The final requirements for submitting the form
-   */
+  
   formElement.addEventListener("submit", finalCheckup);
 
+  /***
+   * 8) The final requirements for submitting the form. Validating all required inputs have correct input
+   */
   function finalCheckup(){
-
     if((paymentVersion == "select method") || (paymentVersion == "credit-card")){
       validCVV();
       validZipCode();
@@ -228,19 +237,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
   nameInput.addEventListener("keyup", validName);
 
+  /***
+   * Checks if name input is valid, displaying error element if not
+   * @returns {boolean} True or false if the name is valid.
+   */
   function validName(){
     let regex = /^\S+$/i;
     let valid = regex.test(nameInput.value);
 
-    console.log("9 ="+ valid);
     return checkIfInputIsValid(valid, nameInput);
   }
 
   emailInput.addEventListener("keyup", validEmail);
 
+  /***
+   * Checks if email input is valid, displaying error element if not along with its reason
+   * @returns {boolean} True or false if the email is valid.
+   */
   function validEmail(){
     let regex = /^[^@]+@[^@.]+\.(com|org|net)$/i;  //  /^[^@]+@[^@.]+\.[a-z]+$/i;
     let valid = regex.test(emailInput.value);
+    let emailErrorMessage = document.querySelector("#email-hint");
+
+    if(emailInput.value === ""){
+      emailErrorMessage.textContent = 'Please enter an email address';
+    } else {
+      emailErrorMessage.textContent = 'Email address must be formatted correctly';
+    }
 
     console.log("3 ="+ valid);
     return checkIfInputIsValid(valid, emailInput);
@@ -248,6 +271,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   activitiesArea.addEventListener("change", validActivitiesAreChecked);
 
+  /***
+   * Checks if valid number of Activities are selected (1 or more). Displaying error element if not
+   * @returns {boolean} True or false if Activities are valid.
+   */
   function validActivitiesAreChecked() {
     const checkboxes = document.querySelectorAll('#activities-box [type="checkbox"]');
     let anyAreChecked = false;
@@ -268,6 +295,10 @@ document.addEventListener('DOMContentLoaded', () => {
     validCreditCard();
   });
 
+  /***
+   * Checks if credit card input is valid, displaying error element if not
+   * @returns {boolean} True or false if the credit card number is valid.
+   */
   function validCreditCard(){
     let regex = /^\d{13,15}$/i;
     let valid = regex.test(cardNumber.value);
@@ -281,6 +312,10 @@ document.addEventListener('DOMContentLoaded', () => {
     validZipCode();
   });
 
+  /***
+   * Checks if Zip Code input is valid, displaying error element if not
+   * @returns {boolean} True or false if the Zip Code is valid.
+   */
   function validZipCode(){
     let regex = /^(\d{5})$/i;
     let valid = regex.test(zipCode.value);
@@ -294,6 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
     validCVV();
   });
 
+    /***
+   * Checks if CVV input is valid, displaying error element if not
+   * @returns {boolean} True or false if the name is valid.
+   */
   function validCVV(){
     let regex = /^(\d{3})$/i;
     let valid = regex.test(CVV.value);
@@ -301,10 +340,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return checkIfInputIsValid(valid, CVV);
   }
 
-
-
-
-
+  /***
+   * Checks if input is valid. Displaying an error element with reason if not
+   * @param {Boolean} valid - Option if element is valid
+   * @param {element} element - element to edit (reveal/hide)
+   * @returns {boolean} True or false if the name is valid.
+   */
   function checkIfInputIsValid(valid, element){
     if (valid){
       makeInputValid(element);
@@ -316,8 +357,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-  * Display notification on valid status
-  * @param {*} element - Input being checked up on
+  * Display notification on its valid status
+  * @param {element} element - Input being checked up on
   */
   function makeInputValid(element){ 
     element.parentElement.classList.remove('not-valid');
@@ -326,8 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-  * Display notification in invalid status, also stopping the final submission
-  * @param {*} element  - Input being checked up on
+  * Display notification as invalid status, also stopping the final submission
+  * @param {element} element - Input being checked up on
+  * @param {Object} event - Event given to the method to stop the default submission
   */
   function makeInputInvalid(element, event){
     event.preventDefault();
@@ -336,14 +378,11 @@ document.addEventListener('DOMContentLoaded', () => {
     element.parentElement.lastElementChild.style.display = 'block';
   }
 
-
-
-  // jobRole.addEventListener('click', (e) => {
-  //     const button = e.target;
-  // }
-
-  // function example(){
-  //     // let value = nameInput.getAttribute("name");
-  //     // console.log("2 ="+ nameInput.length);
-  // }
+  /**
+  * Description
+  * @param {element} element - Input being checked up on
+  * @param {Object} event - Event given to the method to stop the default submission
+  */
+  function example(element, event){
+  }
 });
