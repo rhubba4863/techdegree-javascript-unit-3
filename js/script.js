@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let allActivities = document.querySelectorAll('#activities-box [type="checkbox"]');
   let totalCostArea = document.querySelector('.activities-cost');
 
-  let paymentVersion = "select method";
+  let paymentVersion = "credit-card";
   let paymentType = document.querySelector('#payment');
   let creditCard = document.querySelector('#credit-card');
   let payPal = document.querySelector('#paypal');
@@ -43,6 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
     hideJobRole();
     tShirtColor.disabled = true;
     totalCostArea.textContent = "Total: $0";
+
+    //Payment area. Start back as "Credit Card," then reset its input values
+    let creditCardOption = paymentType.querySelector('option[value="credit-card"]');
+    creditCardOption.selected = true;
     resetPayment();
   }
      
@@ -164,7 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedPayment = paymentType.value;
     paymentVersion = selectedPayment;
 
-    console.log("2 ="+ selectedPayment);
     if(selectedPayment === "credit-card"){
       decideDisplayedPayments(creditCard, true);
       decideDisplayedPayments(payPal, false);
@@ -182,9 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
- /***
-  *  Show Credit Card options, and clear them to original values.
-  */
+  /*** Show Credit Card options, and clear them to original values. */
   function resetPayment(){
     decideDisplayedPayments(creditCard, true);
     decideDisplayedPayments(payPal, false);
@@ -224,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
    * 8) The final requirements for submitting the form. Validating all required inputs have correct input
    */
   function finalCheckup(){
-    if((paymentVersion == "select method") || (paymentVersion == "credit-card")){
+    if(paymentVersion == "credit-card"){
       validCVV();
       validZipCode();
       validCreditCard();
@@ -238,7 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
   nameInput.addEventListener("keyup", validName);
 
   /***
-   * Checks if name input is valid, displaying error element if not
+   * Checks if name input is valid (Not blank or empty), displaying error element if not
    * @returns {boolean} True or false if the name is valid.
    */
   function validName(){
@@ -251,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
   emailInput.addEventListener("keyup", validEmail);
 
   /***
-   * Checks if email input is valid, displaying error element if not along with its reason
+   * Checks if email input is valid (,,,@,,,.com), displaying error element if not along with its reason
    * @returns {boolean} True or false if the email is valid.
    */
   function validEmail(){
@@ -296,11 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /***
-   * Checks if credit card input is valid, displaying error element if not
+   * Checks if credit card input is valid (13-16 numbers alone), displaying error element if not
    * @returns {boolean} True or false if the credit card number is valid.
    */
   function validCreditCard(){
-    let regex = /^\d{13,15}$/i;
+    let regex = /^\d{13,16}$/i;
     let valid = regex.test(cardNumber.value);
 
     return checkIfInputIsValid(valid, cardNumber);
@@ -329,7 +330,7 @@ document.addEventListener('DOMContentLoaded', () => {
     validCVV();
   });
 
-    /***
+  /***
    * Checks if CVV input is valid, displaying error element if not
    * @returns {boolean} True or false if the name is valid.
    */
@@ -379,10 +380,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
-  * Description
-  * @param {element} element - Input being checked up on
-  * @param {Object} event - Event given to the method to stop the default submission
-  */
-  function example(element, event){
+   * 
+   * @param {*} element 
+   * @param {*} event 
+   * @returns 
+   */
+  function example2(element, event){
+    return 3;
   }
 });
